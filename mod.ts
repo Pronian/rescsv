@@ -203,6 +203,6 @@ to update and delete resource files based on a csv file`);
 }
 
 console.time('⏱');
-execute();
+await execute();
 console.timeEnd('⏱');
 console.log('✔💯');
