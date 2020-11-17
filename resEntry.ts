@@ -1,5 +1,10 @@
 import { RES_LOCALE_DEFAULT } from './resConfig.ts';
 
+/**
+ * Represents an entry in a resource file (.properties)
+ * 
+ * Matches the following text format: `key=value`
+ */
 export class ResEntry {
     public value: string;
     private _locale: string;

@@ -1,6 +1,11 @@
 import { RES_FILE_EXT, RES_LOCALE_DEFAULT } from './resConfig.ts';
 import { ResEntry } from './resEntry.ts';
 
+/**
+ * Represents  a resource file (.properties)
+ * 
+ * Entries in this file match the following text format: `key=value`
+ */
 export class ResFile {
     public static parseFile(fileName: string, fileContent: string, mainFile: string): ResFile {
         const resFile = new ResFile(fileName);
