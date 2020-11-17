@@ -147,17 +147,14 @@ async function updateResFromCsv(inputFileName: string, deleteOldEntries?: boolea
         if (deleteOldEntries) {
             const unused = ResFile.getEntriesDiff(csvResFile, currentResFile);
             for (const unusedEntry of unused.entries) {
-                // TODO: convert this to property:
-                const keyValueRE = new RegExp(`^${unusedEntry.key}=.*$`, 'gm');
-                fileContents = fileContents.replace(keyValueRE, '');
+                fileContents = fileContents.replace(unusedEntry.keyEntryRE, '');
                 updated.remove(unusedEntry.key);
                 countDeleted++;
             }
         }
 
         for (const updatedEntry of updated.entries) {
-            const keyValueRE = new RegExp(`^${updatedEntry.key}=.*$`, 'gm');
-            fileContents = fileContents.replace(keyValueRE, updatedEntry.toString());
+            fileContents = fileContents.replace(updatedEntry.keyEntryRE, updatedEntry.toString());
             countUpdated++;
         }
 

@@ -24,6 +24,13 @@ export class ResEntry {
         return this._key;
     }
 
+    /**
+     * A regular expression that describes this particular key with any possible value in a text format
+     */
+    get keyEntryRE() {
+        return new RegExp(`^${this._key}=.*$`, 'gm');
+    }
+
     public toString() {
         return `${this._key}=${this.value}`;
     }
