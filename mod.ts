@@ -167,15 +167,15 @@ async function updateResFromCsv(inputFileName: string, deleteOldEntries?: boolea
     }
 
     if (countDeleted) {
-        console.log(`Deleted ${countDeleted} entries.`);
+        console.log(`Deleted entries: ${countDeleted}`);
     }
 
     if (countUpdated) {
-        console.log(`Updated ${countUpdated} entries.`);
+        console.log(`Updated entries: ${countUpdated}`);
     }
 
     if (countNew) {
-        console.log(`Added ${countNew} new entries.`);
+        console.log(`Added new entries: ${countNew}`);
     }
 }
 
