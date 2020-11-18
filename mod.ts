@@ -1,7 +1,8 @@
 import { RES_FILE_EXT } from "./resConfig.ts";
 import { ResEntry } from "./resEntry.ts";
 import { ResFile } from "./resFile.ts";
-import { existsSync } from "https://deno.land/std@0.77.0/fs/mod.ts";
+import { existsSync } from "https://deno.land/std@0.78.0/fs/mod.ts";
+import { parse as argsParse } from "https://deno.land/std@0.78.0/flags/mod.ts";
 import { readCSV, writeCSV } from "https://deno.land/x/csv/mod.ts";
 
 // The title used for the column that contains the resource file keys
@@ -180,29 +181,26 @@ async function updateResFromCsv(inputFileName: string, deleteOldEntries?: boolea
 }
 
 async function execute() {
-    // TODO: refactor using Deno flags
-    const args = Deno.args;
-    if (args.length === 2 && args[0] === 'c') {
-        await createCsvFromRes(args[1]);
-    } else if (args.length === 2 && args[0] === 's') {
-        await updateResFromCsv(args[1]);
-    } else if (args.length === 2 && args[0] === 'sd') {
-        await updateResFromCsv(args[1], true);
+    const parsedArgs = argsParse(Deno.args);
+
+    if (typeof parsedArgs.c === 'string') {
+        await createCsvFromRes(parsedArgs.c);
+    } else if (typeof parsedArgs.s === 'string') {
+        await updateResFromCsv(parsedArgs.s, !!parsedArgs.d);
     } else {
         console.log('❌ Invalid arguments!');
         console.log(`
-Example: "node index.js c account"
-to create csv file from resource files
+Use: "rescsv -c account"
+to create csv file from resource files beginning with "account"
 OR
-Example: "node index.js s account"
-to update resource files based on a csv file
+Use: "rescsv -s account"
+to update resource files based on a csv file named "account"
 OR
-Example: "node index.js sd account"
-to update and delete resource files based on a csv file`);
+Example: "rescsv -d -s account"
+to update and delete resource files based on a csv file named "account"`);
     }
 }
 
 console.time('⏱');
 await execute();
 console.timeEnd('⏱');
-console.log('✔💯');
