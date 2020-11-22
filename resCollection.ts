@@ -22,7 +22,7 @@ export class ResCollection implements Iterable<[string, ResFile]> {
         this.files.set(file.originFile, file);
     }
 
-    get = this.files.get
+    get = this.files.get.bind(this.files);
 
     toLabeled2DArray(): string[][] {
         const headerColumns = [ResCollection.KeyLabel];
