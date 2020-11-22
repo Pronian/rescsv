@@ -1,6 +1,7 @@
 import { RES_FILE_EXT } from './resConfig.ts';
 import { ResEntry } from './resEntry.ts';
 import { ResFile } from './resFile.ts';
+import { ResCollection } from './resCollection.ts';
 import { existsSync } from 'https://deno.land/std@0.78.0/fs/mod.ts';
 import { parse as argsParse } from 'https://deno.land/std@0.78.0/flags/mod.ts';
 import { readCSV, writeCSV } from 'https://deno.land/x/csv/mod.ts';
@@ -27,14 +28,14 @@ async function createCsvFromRes(inputFileName: string) {
         return;
     }
 
-    const parsedFiles = [];
+    const parsedFiles = new ResCollection(inputFileName);
 
     try {
         console.log('Reading input file: ' + inputFileName);
         for (const resFile of resFiles) {
             const fileContent = await Deno.readTextFile(resFile);
             const parsed = ResFile.parseFile(resFile, fileContent, inputFileName);
-            parsedFiles.push(parsed);
+            parsedFiles.add(parsed);
         }
     } catch (error) {
         console.error('❌ Error while reading input files!');
@@ -42,29 +43,7 @@ async function createCsvFromRes(inputFileName: string) {
         return;
     }
 
-    const headerColumns = [CSV_KEY_TITLE];
-    const allKeys: string[] = [];
-
-    for (const parsedFile of parsedFiles) {
-        headerColumns.push(parsedFile.originFile);
-        allKeys.push(...parsedFile.keys);
-    }
-
-    const uniqueKeys = [...new Set(allKeys)];
-    const csvData: string[][] = [headerColumns];
-
-    for (const key of uniqueKeys) {
-        let csvRow: string[] = [];
-
-        csvRow.push(key);
-
-        for (const parsedFile of parsedFiles) {
-            csvRow.push(parsedFile.getValue(key));
-        }
-
-        csvData.push(csvRow);
-        csvRow = [];
-    }
+    const csvData = parsedFiles.toLabeled2DArray();
 
     try {
         const file = await Deno.open(`${inputFileName}.csv`, { write: true, create: true, truncate: true });

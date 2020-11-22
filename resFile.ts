@@ -31,8 +31,8 @@ export class ResFile {
         return resFile;
     }
 
-    public static getEntriesDiff(oldRes: ResFile, newRes: ResFile, originFile?: string): ResFile {
-        const result = new ResFile(originFile);
+    public static getEntriesDiff(oldRes: ResFile, newRes: ResFile): ResFile {
+        const result = new ResFile(newRes.originFile);
 
         for (const entry of newRes.entries) {
             if (!oldRes.hasKey(entry.key)) {
@@ -43,8 +43,8 @@ export class ResFile {
         return result;
     }
 
-    public static getUpdatedEntries(oldRes: ResFile, newRes: ResFile, originFile?: string): ResFile {
-        const result = new ResFile(originFile);
+    public static getUpdatedEntries(oldRes: ResFile, newRes: ResFile): ResFile {
+        const result = new ResFile(newRes.originFile);
 
         let newValue: string;
         for (const entry of oldRes.entries) {
@@ -61,24 +61,13 @@ export class ResFile {
     private static readonly reRes: RegExp = /^([^=\n]+)=(.+)$/gm;
 
     public entries: ResEntry[];
-    private _originFile: string;
 
-    constructor(originFile?: string, items?: ResEntry[]) {
+    constructor(public readonly originFile: string, items?: ResEntry[]) {
         if (items) {
             this.entries = items;
         } else {
             this.entries = [];
         }
-
-        if (originFile) {
-            this._originFile = originFile;
-        } else {
-            this._originFile = '';
-        }
-    }
-
-    get originFile() {
-        return this._originFile;
     }
 
     get length() {
