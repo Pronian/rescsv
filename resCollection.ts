@@ -4,6 +4,7 @@ import { ResFile } from './resFile.ts';
  * A collection of `ResFile` objects, that share similar entry keys
  */
 export class ResCollection implements Iterable<[string, ResFile]> {
+    /** The title used for the column that contains the resource file keys */
     public static readonly KeyLabel = 'key';
 
     constructor(

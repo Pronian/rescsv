@@ -6,9 +6,6 @@ import { existsSync } from 'https://deno.land/std@0.78.0/fs/mod.ts';
 import { parse as argsParse } from 'https://deno.land/std@0.78.0/flags/mod.ts';
 import { readCSV, writeCSV } from 'https://deno.land/x/csv/mod.ts';
 
-// The title used for the column that contains the resource file keys
-const CSV_KEY_TITLE = 'key';
-
 async function createCsvFromRes(inputFileName: string) {
     const resFiles: string[] = [];
     const reAcceptedFiles = new RegExp(`^${inputFileName}(\\b|_.{1,5})\\.${RES_FILE_EXT}$`);
@@ -57,8 +54,8 @@ async function createCsvFromRes(inputFileName: string) {
     }
 }
 
-async function csvFileToResFileMap(csvFile: Deno.File): Promise<Map<string, ResFile>> {
-    const resFileList = new Map<string, ResFile>();
+async function csvFileToResCollection(name: string, csvFile: Deno.File): Promise<ResCollection> {
+    const resFileList = new ResCollection(name);
     const headerColumns: string[] = [];
 
     let rowNumber = 0;
@@ -70,7 +67,7 @@ async function csvFileToResFileMap(csvFile: Deno.File): Promise<Map<string, ResF
             if (rowNumber === 0) {
                 // Fill file list with the colum names:
                 headerColumns.push(cell);
-                if (cell !== CSV_KEY_TITLE) resFileList.set(cell, new ResFile(cell));
+                if (cell !== ResCollection.KeyLabel) resFileList.add(new ResFile(cell));
             } else if (cellNumber === 0) {
                 // The first cell of each row is the key
                 rowKey = cell;
@@ -102,7 +99,7 @@ async function updateResFromCsv(inputFileName: string, deleteOldEntries?: boolea
         return;
     }
 
-    const resFileList = await csvFileToResFileMap(csvFile);
+    const resFileList = await csvFileToResCollection(inputFileName, csvFile);
 
     let countDeleted = 0;
     let countUpdated = 0;
