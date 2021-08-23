@@ -2,8 +2,8 @@ import { RES_FILE_EXT } from './resConfig.ts';
 import { ResEntry } from './resEntry.ts';
 import { ResFile } from './resFile.ts';
 import { ResCollection } from './resCollection.ts';
-import { existsSync } from 'https://deno.land/std@0.78.0/fs/mod.ts';
-import { parse as argsParse } from 'https://deno.land/std@0.78.0/flags/mod.ts';
+import { existsSync } from 'https://deno.land/std@0.105.0/fs/mod.ts';
+import { parse as argsParse } from 'https://deno.land/std@0.105.0/flags/mod.ts';
 import { readCSV, writeCSV } from 'https://deno.land/x/csv/mod.ts';
 
 async function createCsvFromRes(inputFileName: string) {

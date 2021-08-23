@@ -6,11 +6,14 @@ import { ResFile } from './resFile.ts';
 export class ResCollection implements Iterable<[string, ResFile]> {
     /** The title used for the column that contains the resource file keys */
     public static readonly KeyLabel = 'key';
+    public get: (key: string) => ResFile | undefined;
 
     constructor(
         public readonly name: string,
         private files: Map<string, ResFile> = new Map<string, ResFile>()
-    ) { }
+    ) { 
+        this.get = this.files.get.bind(this.files);
+    }
 
     *[Symbol.iterator](): IterableIterator<[string, ResFile]> {
         for (const file of this.files) {
@@ -21,8 +24,6 @@ export class ResCollection implements Iterable<[string, ResFile]> {
     add(file: ResFile) {
         this.files.set(file.originFile, file);
     }
-
-    get = this.files.get.bind(this.files);
 
     toLabeled2DArray(): string[][] {
         const headerColumns = [ResCollection.KeyLabel];
