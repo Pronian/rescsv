@@ -1,4 +1,4 @@
-import { assertStrictEquals } from "https://deno.land/std@0.105.0/testing/asserts.ts";
+import { assertStrictEquals } from "std/testing/asserts.ts";
 import { ResEntry } from "./resEntry.ts";
 
 Deno.test("resEntry.toString()", () => {
