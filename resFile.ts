@@ -1,126 +1,132 @@
-import { RES_FILE_EXT, RES_LOCALE_DEFAULT } from './resConfig.ts';
-import { ResEntry } from './resEntry.ts';
+import { RES_FILE_EXT, RES_LOCALE_DEFAULT } from "./resConfig.ts";
+import { ResEntry } from "./resEntry.ts";
 
 /**
  * Represents  a resource file (.properties)
- * 
+ *
  * Entries in this file match the following text format: `key=value`
  */
 export class ResFile {
-    public static parseFile(fileName: string, fileContent: string, mainFile: string): ResFile {
-        const resFile = new ResFile(fileName);
+  public static parseFile(
+    fileName: string,
+    fileContent: string,
+    mainFile: string,
+  ): ResFile {
+    const resFile = new ResFile(fileName);
 
-        const fileNoExt = fileName.replace('.' + RES_FILE_EXT, '');
-        let locale: string;
+    const fileNoExt = fileName.replace("." + RES_FILE_EXT, "");
+    let locale: string;
 
-        if (fileNoExt === mainFile) {
-            locale = RES_LOCALE_DEFAULT;
-        } else {
-            locale = fileNoExt.replace(mainFile + '_', '');
-        }
-
-        let entry: ResEntry;
-
-        let matches = this.reRes.exec(fileContent);
-        while (matches?.length === 3) {
-            entry = new ResEntry(matches[1], matches[2], locale);
-            resFile.entries.push(entry);
-            matches = this.reRes.exec(fileContent);
-        }
-
-        return resFile;
+    if (fileNoExt === mainFile) {
+      locale = RES_LOCALE_DEFAULT;
+    } else {
+      locale = fileNoExt.replace(mainFile + "_", "");
     }
 
-    public static getEntriesDiff(oldRes: ResFile, newRes: ResFile): ResFile {
-        const result = new ResFile(newRes.originFile);
+    let entry: ResEntry;
 
-        for (const entry of newRes.entries) {
-            if (!oldRes.hasKey(entry.key)) {
-                result.setEntry(entry);
-            }
-        }
-
-        return result;
+    let matches = this.reRes.exec(fileContent);
+    while (matches?.length === 3) {
+      entry = new ResEntry(matches[1], matches[2], locale);
+      resFile.entries.push(entry);
+      matches = this.reRes.exec(fileContent);
     }
 
-    public static getUpdatedEntries(oldRes: ResFile, newRes: ResFile): ResFile {
-        const result = new ResFile(newRes.originFile);
+    return resFile;
+  }
 
-        let newValue: string;
-        for (const entry of oldRes.entries) {
-            newValue = newRes.getValue(entry.key);
+  public static getEntriesDiff(oldRes: ResFile, newRes: ResFile): ResFile {
+    const result = new ResFile(newRes.originFile);
 
-            if (entry.value !== newValue) {
-                result.setEntry(new ResEntry(entry.key, newValue));
-            }
-        }
-
-        return result;
+    for (const entry of newRes.entries) {
+      if (!oldRes.hasKey(entry.key)) {
+        result.setEntry(entry);
+      }
     }
 
-    private static readonly reRes: RegExp = /^([^=\n]+)=(.+)$/gm;
+    return result;
+  }
 
-    public entries: ResEntry[];
+  public static getUpdatedEntries(oldRes: ResFile, newRes: ResFile): ResFile {
+    const result = new ResFile(newRes.originFile);
 
-    constructor(public readonly originFile: string, items?: ResEntry[]) {
-        if (items) {
-            this.entries = items;
-        } else {
-            this.entries = [];
-        }
+    let newValue: string;
+    for (const entry of oldRes.entries) {
+      newValue = newRes.getValue(entry.key);
+
+      if (entry.value !== newValue) {
+        result.setEntry(new ResEntry(entry.key, newValue));
+      }
     }
 
-    get length() {
-        return this.entries.length;
+    return result;
+  }
+
+  private static readonly reRes: RegExp = /^([^=\n]+)=(.+)$/gm;
+
+  public entries: ResEntry[];
+
+  constructor(public readonly originFile: string, items?: ResEntry[]) {
+    if (items) {
+      this.entries = items;
+    } else {
+      this.entries = [];
+    }
+  }
+
+  get length() {
+    return this.entries.length;
+  }
+
+  get keys() {
+    const result: string[] = [];
+
+    for (const entry of this.entries) {
+      result.push(entry.key);
     }
 
-    get keys() {
-        const result: string[] = [];
+    return result;
+  }
 
-        for (const entry of this.entries) {
-            result.push(entry.key);
-        }
+  public getValue(key: string) {
+    const filtered = this.entries.filter((en) => en.key === key);
 
-        return result;
+    if (filtered.length === 1) {
+      return filtered[0].value;
+    } else if (filtered.length > 1) {
+      return filtered[filtered.length - 1].value;
     }
 
-    public getValue(key: string) {
-        const filtered = this.entries.filter( en => en.key === key);
+    return "";
+  }
 
-        if (filtered.length === 1) {
-            return filtered[0].value;
-        } else if (filtered.length > 1) {
-            return filtered[filtered.length - 1].value;
-        }
+  public hasKey(key: string): boolean {
+    return !!this.entries.find((entry) => entry.key === key);
+  }
 
-        return '';
+  public remove(key: string) {
+    this.entries = this.entries.filter((value) => value.key !== key);
+  }
+
+  public setEntry(entry: ResEntry) {
+    const foundEntry = this.entries.find((existingEntry) =>
+      existingEntry.key === entry.key
+    );
+
+    if (!foundEntry) {
+      this.entries.push(new ResEntry(entry.key, entry.value, entry.locale));
+    } else {
+      foundEntry.value = entry.value;
+    }
+  }
+
+  public toString() {
+    let result = "";
+
+    for (const entry of this.entries) {
+      result += entry.toString() + "\n";
     }
 
-    public hasKey(key: string): boolean {
-        return !!this.entries.find((entry) => entry.key === key);
-    }
-
-    public remove(key: string) {
-        this.entries = this.entries.filter((value) => value.key !== key);
-    }
-
-    public setEntry(entry: ResEntry) {
-        const foundEntry = this.entries.find((existingEntry) => existingEntry.key === entry.key);
-
-        if (!foundEntry) {
-            this.entries.push(new ResEntry(entry.key, entry.value, entry.locale));
-        } else {
-            foundEntry.value = entry.value;
-        }
-    }
-
-    public toString() {
-        let result = '';
-
-        for (const entry of this.entries) {
-            result += entry.toString() + '\n';
-        }
-
-        return result;
-    }
+    return result;
+  }
 }
