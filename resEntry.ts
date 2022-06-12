@@ -30,8 +30,8 @@ export class ResEntry {
   }
 
   /**
-     * A regular expression that describes this particular key with any possible value in a text format
-     */
+   * A regular expression that describes this particular key with any possible value in a text format
+   */
   get keyEntryRE() {
     return new RegExp(`^${this._key}=.*$`, "gm");
   }

@@ -62,7 +62,7 @@ async function createCsvFromRes(inputFileName: string) {
 
 async function csvFileToResCollection(
   name: string,
-  csvFile: Deno.File,
+  csvFile: Deno.FsFile,
 ): Promise<ResCollection> {
   const resFileList = new ResCollection(name);
   const headerColumns: string[] = [];
@@ -70,7 +70,7 @@ async function csvFileToResCollection(
   let rowNumber = 0;
   for await (const row of readCSV(csvFile)) {
     let cellNumber = 0;
-    let rowKey: string = "";
+    let rowKey = "";
 
     for await (const cell of row) {
       if (rowNumber === 0) {
@@ -101,7 +101,7 @@ async function updateResFromCsv(
   inputFileName: string,
   deleteOldEntries?: boolean,
 ) {
-  let csvFile: Deno.File;
+  let csvFile: Deno.FsFile;
 
   try {
     csvFile = await Deno.open(`./${inputFileName}.csv`);
