@@ -5,8 +5,10 @@ import { ResCollection } from "./resCollection.ts";
 import { existsSync } from "std/fs/mod.ts";
 import { parse as argsParse } from "std/flags/mod.ts";
 import { BufReader } from "std/io/mod.ts";
-import { readMatrix as readCSVMatrix } from "std/encoding/csv.ts";
-import { writeCSV } from "https://deno.land/x/csv/mod.ts";
+import {
+  readMatrix as readCSVMatrix,
+  stringify as stringifyCSV,
+} from "std/encoding/csv.ts";
 
 async function createCsvFromRes(inputFileName: string) {
   const resFiles: string[] = [];
@@ -52,8 +54,13 @@ async function createCsvFromRes(inputFileName: string) {
       create: true,
       truncate: true,
     });
-    await writeCSV(file, csvData);
+    const rowAccessors = Array.from(csvData[0].keys());
+    const csvString = await stringifyCSV(csvData, rowAccessors, {
+      headers: false,
+    });
+    await file.write(new TextEncoder().encode(csvString));
     file.close();
+
     console.log(`Success! "${inputFileName}.csv" created!`);
   } catch (error) {
     console.error("❌ Error while writing csv file!");
