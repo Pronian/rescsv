@@ -2,7 +2,6 @@ import { RES_FILE_EXT } from "./resConfig.ts";
 import { ResEntry } from "./resEntry.ts";
 import { ResFile } from "./resFile.ts";
 import { ResCollection } from "./resCollection.ts";
-import { existsSync } from "std/fs/mod.ts";
 import { parse as argsParse } from "std/flags/mod.ts";
 import { BufReader } from "std/io/mod.ts";
 import {
@@ -133,10 +132,11 @@ async function updateResFromCsv(
     let fileContents: string;
     let currentResFile: ResFile;
 
-    if (existsSync(fileName)) {
+    try {
       fileContents = await Deno.readTextFile(fileName);
       currentResFile = ResFile.parseFile(fileName, fileContents, inputFileName);
-    } else {
+    } catch (_error) {
+      // File does not exist
       fileContents = "";
       currentResFile = new ResFile(fileName);
     }
