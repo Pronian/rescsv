@@ -20,7 +20,32 @@ const testFile3 = new ResFile("origin_3", [
   new ResEntry("tr", "trio, oi"),
 ]);
 
-Deno.test("ResCollection", () => {
+Deno.test("ResCollection.fromLabeled2DArray", () => {
+  const dataArray = [
+    ["key", "origin_1", "origin_2", "origin_3"],
+    ["first", "1", "2", "3"],
+    ["second", "", "oh too", "oh three"],
+    ["tr", "three or 3", "", "trio, oi"],
+  ];
+
+  const collection = ResCollection.fromLabeled2DArray("origin", dataArray);
+
+  assertStrictEquals(collection.name, "origin");
+  assertStrictEquals(
+    collection.get("origin_1")?.toString(),
+    "first=1\ntr=three or 3\n",
+  );
+  assertStrictEquals(
+    collection.get("origin_2")?.toString(),
+    "first=2\nsecond=oh too\n",
+  );
+  assertStrictEquals(
+    collection.get("origin_3")?.toString(),
+    "first=3\nsecond=oh three\ntr=trio, oi\n",
+  );
+});
+
+Deno.test("ResCollection.toLabeled2DArray", () => {
   const col = new ResCollection("origin", new Map().set("origin_1", testFile1));
   col.add(testFile2);
   col.add(testFile3);
