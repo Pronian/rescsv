@@ -1,5 +1,4 @@
 import { RES_FILE_EXT } from "./resConfig.ts";
-import { ResEntry } from "./resEntry.ts";
 import { ResFile } from "./resFile.ts";
 import { ResCollection } from "./resCollection.ts";
 import { parse as argsParse } from "std/flags/mod.ts";
@@ -72,39 +71,10 @@ async function csvFileToResCollection(
   name: string,
   csvFile: Deno.FsFile,
 ): Promise<ResCollection> {
-  const resFileList = new ResCollection(name);
-  const headerColumns: string[] = [];
-
   const csvData = await readCSVMatrix(new BufReader(csvFile));
-
-  let rowNumber = 0;
-  for (const row of csvData) {
-    let cellNumber = 0;
-    let rowKey = "";
-
-    for (const cell of row) {
-      if (rowNumber === 0) {
-        // Fill file list with the colum names:
-        headerColumns.push(cell);
-        if (cell !== ResCollection.KeyLabel) resFileList.add(new ResFile(cell));
-      } else if (cellNumber === 0) {
-        // The first cell of each row is the key
-        rowKey = cell;
-      } else if (cellNumber > 0) {
-        const headerColumn = headerColumns[cellNumber];
-        const resFile = resFileList.get(headerColumn);
-        if (rowKey && resFile && cell) {
-          resFile.setEntry(new ResEntry(rowKey, cell));
-        }
-      }
-      cellNumber++;
-    }
-    rowNumber++;
-  }
-
   csvFile.close();
 
-  return resFileList;
+  return ResCollection.fromLabeled2DArray(name, csvData);
 }
 
 async function updateResFromCsv(
