@@ -1,6 +1,6 @@
 # ResCSV
 
-ResCSV is a Deno CLI app that converts a group Java resource files
+ResCSV is a Deno CLI app that converts a group of Java resource files
 (`.properties`) files to `.csv`s and vice versa.
 
 This is useful for cases where resource files are used for localization. Instead
@@ -37,7 +37,7 @@ deno run --allow-read --allow-write mod.ts
 
 - `-c <file_name_without_extension>` This command will create a CSV file from
   resource files beginning with the provided file name. The provided file name
-  will also be used as the for the CSV file.
+  will also be used as for the CSV file.
 
 - `-s <file_name_without_extension>` This command will create or update several
   `.properties` files with the values of the provided CSV files. It will not
