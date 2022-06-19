@@ -1,5 +1,6 @@
-import { RES_FILE_EXT, RES_LOCALE_DEFAULT } from "./resConfig.ts";
+import { RES_LOCALE_DEFAULT } from "./resConfig.ts";
 import { ResEntry } from "./resEntry.ts";
+import { parse as parsePath } from "std/path/mod.ts";
 
 /**
  * Represents  a resource file (.properties)
@@ -14,13 +15,14 @@ export class ResFile {
   ): ResFile {
     const resFile = new ResFile(fileName);
 
-    const fileNoExt = fileName.replace("." + RES_FILE_EXT, "");
     let locale: string;
 
-    if (fileNoExt === mainFile) {
+    if (fileName === mainFile) {
       locale = RES_LOCALE_DEFAULT;
     } else {
-      locale = fileNoExt.replace(mainFile + "_", "");
+      const fileNoExt = parsePath(fileName).name;
+      const mainFileNoExt = parsePath(mainFile).name;
+      locale = fileNoExt.replace(mainFileNoExt + "_", "");
     }
 
     let entry: ResEntry;

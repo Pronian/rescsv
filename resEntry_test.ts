@@ -13,3 +13,8 @@ Deno.test("default entry locale", () => {
   const entry1 = new ResEntry("key1", "value1");
   assertStrictEquals(entry1.locale, "default");
 });
+
+Deno.test("entry regular expression", () => {
+  const entry1 = new ResEntry("key1", "value1");
+  assertStrictEquals(entry1.keyEntryRE.source, "^key1=.*$");
+});

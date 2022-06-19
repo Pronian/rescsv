@@ -1,4 +1,5 @@
 import { assertStrictEquals } from "std/testing/asserts.ts";
+import { RES_LOCALE_DEFAULT } from "./resConfig.ts";
 import { ResEntry } from "./resEntry.ts";
 import { ResFile } from "./resFile.ts";
 
@@ -10,6 +11,24 @@ const testRead = new ResFile("origin.properties", [
 ]);
 const writeFile = new ResFile("origin.properties");
 const empty = new ResFile("origin.properties");
+
+Deno.test("default locale", () => {
+  const parsed = ResFile.parseFile(
+    "origin.properties",
+    "name=Test Name",
+    "origin.properties",
+  );
+  assertStrictEquals(parsed.entries[0].locale, RES_LOCALE_DEFAULT);
+});
+
+Deno.test("non-default locale", () => {
+  const parsed = ResFile.parseFile(
+    "origin_de.properties",
+    "name=Test Name",
+    "origin.properties",
+  );
+  assertStrictEquals(parsed.entries[0].locale, "de");
+});
 
 Deno.test("get present value", () => {
   assertStrictEquals(testRead.getValue("foo"), "bar");
