@@ -12,7 +12,7 @@ import {
 async function createCsvFromRes(inputFileName: string) {
   const resFiles: string[] = [];
   const reAcceptedFiles = new RegExp(
-    `^${inputFileName}(\\b|_.{1,5})\\.${RES_FILE_EXT}$`
+    `^${inputFileName}(\\b|_.{1,5})\\.${RES_FILE_EXT}$`,
   );
 
   for await (const dirEntry of Deno.readDir("./")) {
@@ -70,7 +70,7 @@ async function createCsvFromRes(inputFileName: string) {
 
 async function csvFileToResCollection(
   name: string,
-  csvFile: Deno.FsFile
+  csvFile: Deno.FsFile,
 ): Promise<ResCollection> {
   const resFileList = new ResCollection(name);
   const headerColumns: string[] = [];
@@ -109,7 +109,7 @@ async function csvFileToResCollection(
 
 async function updateResFromCsv(
   inputFileName: string,
-  deleteOldEntries?: boolean
+  deleteOldEntries?: boolean,
 ) {
   let csvFile: Deno.FsFile;
 
@@ -156,7 +156,7 @@ async function updateResFromCsv(
     for (const updatedEntry of updated.entries) {
       fileContents = fileContents.replace(
         updatedEntry.keyEntryRE,
-        updatedEntry.toString()
+        updatedEntry.toString(),
       );
       countUpdated++;
     }
