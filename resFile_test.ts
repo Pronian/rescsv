@@ -34,6 +34,16 @@ Deno.test("get present value", () => {
   assertStrictEquals(testRead.getValue("foo"), "bar");
 });
 
+Deno.test("get duplicated value", () => {
+  const testDup = new ResFile("origin.properties", [
+    new ResEntry("name", "Test Name"),
+    new ResEntry("duplicated", "1"),
+    new ResEntry("duplicated", "2"),
+    new ResEntry("foo", "bar"),
+  ]);
+  assertStrictEquals(testDup.getValue("duplicated"), "2");
+});
+
 Deno.test("get missing value", () => {
   assertStrictEquals(testRead.getValue("missing"), "");
 });
@@ -41,6 +51,25 @@ Deno.test("get missing value", () => {
 Deno.test("check has key", () => {
   assertStrictEquals(testRead.hasKey("foo"), true);
   assertStrictEquals(testRead.hasKey("missing"), false);
+});
+
+Deno.test("remove entry by key", () => {
+  const testRemove = new ResFile("origin.properties", [
+    new ResEntry("name", "Test Name"),
+    new ResEntry("second", "2"),
+    new ResEntry("foo", "bar"),
+    new ResEntry("duplicated", "1"),
+    new ResEntry("duplicated", "2"),
+    new ResEntry("last", "With {0} Placeholder"),
+  ]);
+
+  testRemove.remove("foo");
+  assertStrictEquals(testRemove.entries.length, 5);
+  assertStrictEquals(testRemove.hasKey("foo"), false);
+
+  testRemove.remove("duplicated");
+  assertStrictEquals(testRemove.entries.length, 3);
+  assertStrictEquals(testRemove.hasKey("duplicated"), false);
 });
 
 Deno.test("setEntry using empty file", () => {
