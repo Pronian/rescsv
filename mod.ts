@@ -1,4 +1,4 @@
-import { RES_FILE_EXT } from "./resConfig.ts";
+import { parseResFileName, RES_FILE_EXT } from "./resConfig.ts";
 import { ResFile } from "./resFile.ts";
 import { ResCollection } from "./resCollection.ts";
 import { parse as argsParse } from "std/flags/mod.ts";
@@ -10,9 +10,14 @@ import {
 
 async function createCsvFromRes(inputFileName: string) {
   const resFiles: string[] = [];
-  const reAcceptedFiles = new RegExp(
-    `^${inputFileName}(\\b|_.{1,5})\\.${RES_FILE_EXT}$`,
-  );
+  let reAcceptedFiles;
+  if (!inputFileName) {
+    reAcceptedFiles = new RegExp(`\\.${RES_FILE_EXT}$`);
+  } else {
+    reAcceptedFiles = new RegExp(
+      `^${inputFileName}(\\b|_.{1,5})\\.${RES_FILE_EXT}$`,
+    );
+  }
 
   for await (const dirEntry of Deno.readDir("./")) {
     if (dirEntry.isDirectory) continue;
@@ -24,7 +29,10 @@ async function createCsvFromRes(inputFileName: string) {
     }
   }
 
-  if (!resFiles.length) {
+  if (!resFiles.length && !inputFileName) {
+    console.log("No properties files found.");
+    return;
+  } else if (!resFiles.length) {
     console.log(`No properties files found starting with "${inputFileName}"`);
     return;
   }
@@ -34,8 +42,9 @@ async function createCsvFromRes(inputFileName: string) {
   try {
     console.log("Reading input file: " + inputFileName);
     for (const resFile of resFiles) {
+      const parsedFileName = parseResFileName(resFile);
       const fileContent = await Deno.readTextFile(resFile);
-      const parsed = ResFile.parseFile(resFile, fileContent, inputFileName);
+      const parsed = ResFile.parseFile(resFile, fileContent, parsedFileName.fileId);
       parsedFiles.add(parsed);
     }
   } catch (error) {
@@ -47,7 +56,7 @@ async function createCsvFromRes(inputFileName: string) {
   const csvData = parsedFiles.toLabeled2DArray();
 
   try {
-    const file = await Deno.open(`${inputFileName}.csv`, {
+    const file = await Deno.open(`${inputFileName || 'all'}.csv`, {
       write: true,
       create: true,
       truncate: true,
@@ -59,7 +68,7 @@ async function createCsvFromRes(inputFileName: string) {
     await file.write(new TextEncoder().encode(csvString));
     file.close();
 
-    console.log(`Success! "${inputFileName}.csv" created!`);
+    console.log(`Success! "${inputFileName || 'all'}.csv" created!`);
   } catch (error) {
     console.error("❌ Error while writing csv file!");
     console.error(error);
@@ -155,20 +164,23 @@ async function updateResFromCsv(
 async function execute() {
   const parsedArgs = argsParse(Deno.args);
 
-  if (typeof parsedArgs.c === "string") {
-    await createCsvFromRes(parsedArgs.c);
+  if (typeof parsedArgs.c === "string" || parsedArgs.c === true) {
+    const inputFileName = typeof parsedArgs.c === "string" ? parsedArgs.c : "";
+    await createCsvFromRes(inputFileName);
   } else if (typeof parsedArgs.s === "string") {
     await updateResFromCsv(parsedArgs.s, !!parsedArgs.d);
   } else {
     console.log("❌ Invalid arguments!");
     console.log(`
+Use: "rescsv -c"
+to create a csv file from all resource files in the current directory (creates "all.csv")
 Use: "rescsv -c account"
 to create csv file from resource files beginning with "account"
 OR
 Use: "rescsv -s account"
 to update resource files based on a csv file named "account"
 OR
-Example: "rescsv -d -s account"
+Use: "rescsv -d -s account"
 to update and delete resource files based on a csv file named "account"`);
   }
 }

@@ -3,7 +3,7 @@ import { ResEntry } from "./resEntry.ts";
 import { parse as parsePath } from "std/path/mod.ts";
 
 /**
- * Represents  a resource file (.properties)
+ * Represents a resource file (.properties)
  *
  * Entries in this file match the following text format: `key=value`
  */
