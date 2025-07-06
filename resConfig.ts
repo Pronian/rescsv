@@ -10,3 +10,22 @@ export function parseResFileName(fileName: string) {
 
     return { fileId, locale };
 }
+
+/**
+ * Generates a resource file name from the given file ID and locale.
+ * If the locale is the default, it returns `fileId.properties`.
+ * Otherwise, it returns `${fileId}_${locale}.properties`.
+ * @param fileId - The base ID of the resource file.
+ * @param locale - The locale for the resource file.
+ * @returns The formatted resource file name.
+ */
+export function resFileNameFromIdAndLocale(
+  fileId: string,
+  locale: string,
+): string {
+  if (locale === RES_LOCALE_DEFAULT) {
+    return `${fileId}.${RES_FILE_EXT}`;
+  } else {
+    return `${fileId}_${locale}.${RES_FILE_EXT}`;
+  }
+}

@@ -1,4 +1,4 @@
-import { parseResFileName } from "./resConfig.ts";
+import { parseResFileName, resFileNameFromIdAndLocale } from "./resConfig.ts";
 import { ResEntry } from "./resEntry.ts";
 import { ResFile } from "./resFile.ts";
 
@@ -17,27 +17,21 @@ export class ResCollection implements Iterable<[string, ResFile]> {
     for (const row of dataArray) {
       let cellNumber = 0;
       let rowKey = "";
-      let fileId = ":"
+      let fileId = ":";
 
       for (const cell of row) {
         if (rowNumber === 0) {
           // Fill file list with the column names:
           headerColumns.push(cell);
-          if (cell !== ResCollection.KeyLabel) {
-            collection.add(new ResFile(cell));
-          }
         } else if (cellNumber === 0) {
           // The first cell of each row is the `fileId:key`, example: `account:label.email`
-          [fileId, rowKey] = cell.split(':');
+          [fileId, rowKey] = cell.split(":");
         } else if (cellNumber > 0) {
           const headerColumn = headerColumns[cellNumber];
-          let fileName = `${fileId}_${headerColumn}.properties`;
-          if (headerColumn === "default") {
-            fileName = `${name}.properties`;
-          }
+          const fileName = resFileNameFromIdAndLocale(fileId, headerColumn);
           const resFile = collection.getOrCreate(fileName);
 
-          if (rowKey && resFile && cell) {
+          if (rowKey && cell) {
             resFile.setEntry(new ResEntry(rowKey, cell));
           }
         }
@@ -62,7 +56,7 @@ export class ResCollection implements Iterable<[string, ResFile]> {
     const newFile = new ResFile(key);
     this.add(newFile);
     return newFile;
-  };
+  }
 
   constructor(
     public readonly name: string,
@@ -102,7 +96,7 @@ export class ResCollection implements Iterable<[string, ResFile]> {
       row.push(key);
 
       for (let c = 1; c < result[0].length; c++) {
-        const [rowFile, keyValue] = key.split(':');
+        const [rowFile, keyValue] = key.split(":");
         const columnLocale = result[0][c];
 
         let resFile;

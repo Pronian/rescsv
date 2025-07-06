@@ -40,25 +40,37 @@ Deno.test("ResCollection.toLabeled2DArray", () => {
 
 Deno.test("ResCollection.fromLabeled2DArray", () => {
   const dataArray = [
-    ["key", "origin_1", "origin_2", "origin_3"],
-    ["first", "1", "2", "3"],
-    ["second", "", "oh too", "oh three"],
-    ["tr", "three or 3", "", "trio, oi"],
+    ["key", "default", "en_IE", "tr"],
+    ["file1:first", "1", "2", "3"],
+    ["file1:second", "", "oh too", "oh three"],
+    ["file2:tr", "three or 3", "", "trio, oi"],
   ];
 
   const collection = ResCollection.fromLabeled2DArray("origin", dataArray);
 
   assertStrictEquals(collection.name, "origin");
   assertStrictEquals(
-    collection.get("origin_1")?.toString(),
-    "first=1\ntr=three or 3\n",
+    collection.get("file1.properties")?.toString(),
+    "first=1\n",
   );
   assertStrictEquals(
-    collection.get("origin_2")?.toString(),
+    collection.get("file1_en_IE.properties")?.toString(),
     "first=2\nsecond=oh too\n",
   );
   assertStrictEquals(
-    collection.get("origin_3")?.toString(),
-    "first=3\nsecond=oh three\ntr=trio, oi\n",
+    collection.get("file1_tr.properties")?.toString(),
+    "first=3\nsecond=oh three\n",
+  );
+  assertStrictEquals(
+    collection.get("file2.properties")?.toString(),
+    "tr=three or 3\n",
+  );
+  assertStrictEquals(
+    collection.get("file2_en_IE.properties")?.toString(),
+    "",
+  );
+  assertStrictEquals(
+    collection.get("file2_tr.properties")?.toString(),
+    "tr=trio, oi\n",
   );
 });
