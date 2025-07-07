@@ -44,7 +44,11 @@ async function createCsvFromRes(inputFileName: string) {
     for (const resFile of resFiles) {
       const parsedFileName = parseResFileName(resFile);
       const fileContent = await Deno.readTextFile(resFile);
-      const parsed = ResFile.parseFile(resFile, fileContent, parsedFileName.fileId);
+      const parsed = ResFile.parseFile(
+        resFile,
+        fileContent,
+        parsedFileName.fileId,
+      );
       parsedFiles.add(parsed);
     }
   } catch (error) {
@@ -56,7 +60,7 @@ async function createCsvFromRes(inputFileName: string) {
   const csvData = parsedFiles.toLabeled2DArray();
 
   try {
-    const file = await Deno.open(`${inputFileName || 'all'}.csv`, {
+    const file = await Deno.open(`${inputFileName || "all"}.csv`, {
       write: true,
       create: true,
       truncate: true,
@@ -68,7 +72,7 @@ async function createCsvFromRes(inputFileName: string) {
     await file.write(new TextEncoder().encode(csvString));
     file.close();
 
-    console.log(`Success! "${inputFileName || 'all'}.csv" created!`);
+    console.log(`Success! "${inputFileName || "all"}.csv" created!`);
   } catch (error) {
     console.error("❌ Error while writing csv file!");
     console.error(error);
