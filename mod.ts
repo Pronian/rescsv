@@ -1,12 +1,12 @@
+import { parseArgs } from "@std/cli";
 import { parseResFileName, RES_FILE_EXT } from "./resConfig.ts";
 import { ResFile } from "./resFile.ts";
 import { ResCollection } from "./resCollection.ts";
-import { parse as argsParse } from "std/flags/mod.ts";
-import { BufReader } from "std/io/mod.ts";
+
 import {
-  readMatrix as readCSVMatrix,
+  parse as parseCSV,
   stringify as stringifyCSV,
-} from "std/encoding/csv.ts";
+} from "@std/csv";
 
 async function createCsvFromRes(inputFileName: string) {
   const resFiles: string[] = [];
@@ -65,8 +65,7 @@ async function createCsvFromRes(inputFileName: string) {
       create: true,
       truncate: true,
     });
-    const rowAccessors = Array.from(csvData[0].keys());
-    const csvString = await stringifyCSV(csvData, rowAccessors, {
+    const csvString = await stringifyCSV(csvData, {
       headers: false,
     });
     await file.write(new TextEncoder().encode(csvString));
@@ -82,10 +81,9 @@ async function createCsvFromRes(inputFileName: string) {
 
 async function csvFileToResCollection(
   name: string,
-  csvFile: Deno.FsFile,
+  csvFile: string,
 ): Promise<ResCollection> {
-  const csvData = await readCSVMatrix(new BufReader(csvFile));
-  csvFile.close();
+  const csvData = await parseCSV(csvFile);
 
   return ResCollection.fromLabeled2DArray(name, csvData);
 }
@@ -94,10 +92,10 @@ async function updateResFromCsv(
   inputFileName: string,
   deleteOldEntries?: boolean,
 ) {
-  let csvFile: Deno.FsFile;
+  let csvFile: string;
 
   try {
-    csvFile = await Deno.open(`./${inputFileName}.csv`);
+    csvFile = await Deno.readTextFile(`./${inputFileName}.csv`);
   } catch (error) {
     console.error("❌ Error while reading input file!");
     console.error(error);
@@ -166,7 +164,7 @@ async function updateResFromCsv(
 }
 
 async function execute() {
-  const parsedArgs = argsParse(Deno.args);
+  const parsedArgs = parseArgs(Deno.args);
 
   if (typeof parsedArgs.c === "string" || parsedArgs.c === true) {
     const inputFileName = typeof parsedArgs.c === "string" ? parsedArgs.c : "";

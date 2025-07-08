@@ -1,4 +1,4 @@
-import { assertStrictEquals } from "std/testing/asserts.ts";
+import { assertStrictEquals } from "@std/assert";
 import { RES_LOCALE_DEFAULT } from "./resConfig.ts";
 import { ResEntry } from "./resEntry.ts";
 import { ResFile } from "./resFile.ts";

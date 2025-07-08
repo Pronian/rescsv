@@ -1,6 +1,6 @@
+import { parse as parsePath } from "@std/path";
 import { RES_LOCALE_DEFAULT } from "./resConfig.ts";
 import { ResEntry } from "./resEntry.ts";
-import { parse as parsePath } from "std/path/mod.ts";
 
 /**
  * Represents a resource file (.properties)

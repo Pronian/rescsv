@@ -1,4 +1,4 @@
-import { assertStrictEquals } from "std/testing/asserts.ts";
+import { assertStrictEquals } from "@std/assert";
 import { ResCollection } from "./resCollection.ts";
 import { ResEntry } from "./resEntry.ts";
 import { ResFile } from "./resFile.ts";
