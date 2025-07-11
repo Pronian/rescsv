@@ -30,12 +30,12 @@ Deno.test('ResCollection.toLabeled2DArray', () => {
 
 	const res = col.toLabeled2DArray().map((i) => i.join(','));
 	assertStrictEquals(res.length, 6);
-	assertStrictEquals(res[0], 'key,default,so_SO,kr');
+	assertStrictEquals(res[0], 'key,default,kr,so_SO');
 	assertStrictEquals(res[1], 'origin:key,value,,');
-	assertStrictEquals(res[2], 'origin:second,2,22,23');
-	assertStrictEquals(res[3], 'origin:tr,three or 3,,trio, oi');
-	assertStrictEquals(res[4], 'origin:key.son,,val, son,');
-	assertStrictEquals(res[5], 'origin:kra.kra.kra,,,V V V V V');
+	assertStrictEquals(res[2], 'origin:second,2,23,22');
+	assertStrictEquals(res[3], 'origin:tr,three or 3,trio, oi,');
+	assertStrictEquals(res[4], 'origin:key.son,,,val, son');
+	assertStrictEquals(res[5], 'origin:kra.kra.kra,,V V V V V,');
 });
 
 Deno.test('ResCollection.fromLabeled2DArray', () => {

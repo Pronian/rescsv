@@ -1,4 +1,4 @@
-import { parseResFileName, resFileNameFromIdAndLocale } from './resConfig.ts';
+import { parseResFileName, resFileNameFromIdAndLocale, sortLocaleColumns } from './resConfig.ts';
 import { ResEntry } from './resEntry.ts';
 import { ResFile } from './resFile.ts';
 
@@ -88,7 +88,8 @@ export class ResCollection implements Iterable<[string, ResFile]> {
 			}
 		}
 
-		const result: string[][] = [Array.from(headerColumns)];
+		const sortedHeaderColumns = sortLocaleColumns(Array.from(headerColumns));
+		const result: string[][] = [sortedHeaderColumns];
 
 		for (const key of uniqueKeys) {
 			const row: string[] = [];
@@ -99,12 +100,8 @@ export class ResCollection implements Iterable<[string, ResFile]> {
 				const [rowFile, keyValue] = key.split(':');
 				const columnLocale = result[0][c];
 
-				let resFile;
-				if (columnLocale === 'default') {
-					resFile = this.get(`${rowFile}.properties`);
-				} else {
-					resFile = this.get(`${rowFile}_${columnLocale}.properties`);
-				}
+				const fileName = resFileNameFromIdAndLocale(rowFile, columnLocale);
+				const resFile = this.get(fileName);
 				if (!resFile) {
 					row.push('');
 					continue;

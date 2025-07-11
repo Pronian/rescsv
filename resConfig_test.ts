@@ -1,5 +1,5 @@
 import { assertEquals } from '@std/assert';
-import { parseResFileName, resFileNameFromIdAndLocale } from './resConfig.ts';
+import { parseResFileName, resFileNameFromIdAndLocale, sortLocaleColumns } from './resConfig.ts';
 
 Deno.test('parseResFileName', () => {
 	assertEquals(parseResFileName('fileId_en_US.properties'), {
@@ -40,5 +40,22 @@ Deno.test('resFileNameFromIdAndLocale', () => {
 	assertEquals(
 		resFileNameFromIdAndLocale('test', 'it_IT'),
 		'test_it_IT.properties',
+	);
+});
+
+Deno.test('sortLocaleColumns', () => {
+	assertEquals(
+		sortLocaleColumns(['jp', 'en_US', 'default', 'fr_CA', 'en', 'fr_FR', 'en_GB', 'fr', 'key']),
+		[
+			'key',
+			'default',
+			'en',
+			'en_GB',
+			'en_US',
+			'fr',
+			'fr_CA',
+			'fr_FR',
+			'jp',
+		],
 	);
 });

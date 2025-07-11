@@ -44,3 +44,35 @@ export function resFileNameFromIdAndLocale(
 		return `${fileId}_${locale}.${RES_FILE_EXT}`;
 	}
 }
+
+/**
+ * Sorts an array of locale column names so that 'key' and 'default' come first,
+ * 'en' and 'en_XX' come next, followed by other locales in alphabetical order.
+ * @param columns - an array of column names
+ */
+export function sortLocaleColumns(columns: string[]): string[] {
+	return columns.toSorted((a, b) => {
+		const specialSortOrder = ['key', RES_LOCALE_DEFAULT];
+		const aIndex = specialSortOrder.indexOf(a);
+		const bIndex = specialSortOrder.indexOf(b);
+
+		if (aIndex !== -1 && bIndex !== -1) {
+			return aIndex - bIndex;
+		}
+		if (aIndex !== -1) return -1;
+		if (bIndex !== -1) return 1;
+
+		const aIsEnglish = a.startsWith('en');
+		const bIsEnglish = b.startsWith('en');
+
+		if (aIsEnglish && bIsEnglish) {
+			return a.localeCompare(b);
+		} else if (aIsEnglish) {
+			return -1;
+		} else if (bIsEnglish) {
+			return 1;
+		} else {
+			return a.localeCompare(b);
+		}
+	});
+}
